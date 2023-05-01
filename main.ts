@@ -44,7 +44,21 @@ console.log('---------------');
 // productService.deleteProductByProductId(2);
 
 
+const express = require('express')
+const app = express()
 
+// @ts-ignore
+app.get('/api/v1/admin/products/:productId', function (req, res) {
+    console.log("Try find product by id", req.params.productId);
+    const productId : number= Number(req.params.productId);
+    const product: Product = productService.getProductByProductId(productId);
+    console.log("Found product by id", productId, product);
+    res.json(product);
+})
+
+app.listen(3003, '0.0.0.0', function () {
+    console.log('Listening at http://localhost:3003/\n')
+})
 
 
 
