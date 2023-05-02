@@ -27,4 +27,15 @@ export class CategoryService {
         return categoryName;
     }
 
+
+    getCategoryByCategoryId(categoryId: number): Category {
+        let foundCategory: Category;
+        for (let category of this.categories) {
+            if(category.id === categoryId) {
+                foundCategory = category;
+            }
+        }
+        return foundCategory;
+    }
+
 }

@@ -1,6 +1,7 @@
 import {Product} from "./product.model";
 import {ProductService} from "./product.service";
 import {CategoryService} from "./category.service";
+import {Category} from "./category.model";
 
 
 const productService = new ProductService();
@@ -23,10 +24,11 @@ let product: Product = productService.getProductByProductId(5);
 
 console.log('---------------');
 
-//дернуть метод, который возвращает имя категорий по айдишникам категорий в продакте
-let categoryName: string = categoryService.getCategoryNameByCategoryId(2);
-console.log(categoryName);
 
+// let categoryName: string = categoryService.getCategoryNameByCategoryId(2);
+// console.log(categoryName);
+
+// console.log(categoryService.getCategoryByCategoryId(4));
 
 
 
@@ -56,10 +58,17 @@ app.get('/api/v1/admin/products/:productId', function (req, res) {
     res.json(product);
 })
 
+
+
+// @ts-ignore
+app.get('/api/v1/admin/categories/:categoryId', function (req, res) {
+    console.log("Try find category by id", req.params.categoryId);
+    const categoryId : number= Number(req.params.categoryId);
+    const category: Category = categoryService.getCategoryByCategoryId(categoryId);
+    console.log("Found category by id", categoryId, category);
+    res.json(category);
+})
+
 app.listen(3003, '0.0.0.0', function () {
     console.log('Listening at http://localhost:3003/\n')
 })
-
-
-
-
