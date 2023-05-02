@@ -85,7 +85,7 @@ app.delete('/api/v1/admin/products/:productId', (req, res) => {
     let deletedProduct: Product = productService.deleteProductByProductId(productId);
     if (deletedProduct) {
         console.log(`product with id: ${productId}  was DELETED`);
-        res.json({deletedProduct});
+        res.json(deletedProduct);
     } else {
         console.log(`product with id: ${productId}  NOT FOUND`);
         res.status(404).json({error: `product with id: ${productId}  NOT FOUND`});
@@ -102,7 +102,7 @@ app.delete('/api/v1/admin/categories/:categoryId', (req, res) => {
     let deletedCategory: Category = categoryService.deleteCategoryByCategoryId(categoryId);
     if (deletedCategory) {
         console.log(`category with id: ${categoryId}  was DELETED`);
-        res.json({deletedCategory});
+        res.json(deletedCategory);
     } else {
         console.log(`category with id: ${categoryId}  NOT FOUND`);
         res.status(404).json({error: `category with id: ${categoryId}  NOT FOUND`});
