@@ -41,16 +41,16 @@ export class ProductService {
         }
     };
 
-    deleteProductByProductId(productId: number): void {
+    deleteProductByProductId(productId: number): Product {
         for (let i = 0; i < this.products.length; i += 1) {
+          let deletedProduct: Product = this.products[i];
             if (this.products[i].id === productId) {
                 this.products.splice(i, 1);
                 console.log(`Product with id ${productId} was successful deleted.`);
-                // console.log(this.products);
-                return;
+                return deletedProduct;
             }
         }
-        console.log('there is no product with such index');
+        console.log('there is no product with such id');
     };
 
 }

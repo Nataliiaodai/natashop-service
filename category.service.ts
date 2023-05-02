@@ -38,4 +38,18 @@ export class CategoryService {
         return foundCategory;
     }
 
+
+
+    deleteCategoryByCategoryId(categoryId: number) : Category {
+        for (let i = 0; i < this.categories.length; i += 1) {
+            if (this.categories[i].id === categoryId) {
+                let deletedCategory: Category = this.categories[i]
+                this.categories.splice(i, 1);
+                console.log(`Category with id ${categoryId} was successful deleted.`);
+                return deletedCategory;
+            }
+        }
+        console.log('there is no category with such id');
+    }
+
 }
