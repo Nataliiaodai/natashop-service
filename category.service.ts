@@ -31,7 +31,7 @@ export class CategoryService {
     getCategoryByCategoryId(categoryId: number): Category {
         let foundCategory: Category;
         for (let category of this.categories) {
-            if(category.id === categoryId) {
+            if (category.id === categoryId) {
                 foundCategory = category;
             }
         }
@@ -39,17 +39,33 @@ export class CategoryService {
     }
 
 
-
-    deleteCategoryByCategoryId(categoryId: number) : Category {
+    deleteCategoryByCategoryId(categoryId: number): Category {
+        let deletedCategory: Category;
         for (let i = 0; i < this.categories.length; i += 1) {
             if (this.categories[i].id === categoryId) {
-                let deletedCategory: Category = this.categories[i]
+                deletedCategory = this.categories[i];
                 this.categories.splice(i, 1);
                 console.log(`Category with id ${categoryId} was successful deleted.`);
-                return deletedCategory;
+                break;
             }
         }
-        console.log('there is no category with such id');
+        if (!deletedCategory) {
+            console.log('there is no category with such id');
+        }
+        return deletedCategory;
+    }
+
+
+    changeCategoryByCategoryId(categoryId: number, source: Category): Category {
+        let changedCategory: Category;
+        const categoryToChange: Category = this.getCategoryByCategoryId(categoryId);
+
+        if (categoryToChange) {
+            source.id = categoryId;
+            changedCategory = Object.assign(categoryToChange, source)
+        }
+
+        return changedCategory;
     }
 
 }
