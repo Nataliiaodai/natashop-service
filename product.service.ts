@@ -1,4 +1,5 @@
 import {Product} from "./product.model";
+import {Category} from "./category.model";
 
 export class ProductService {
 
@@ -6,7 +7,7 @@ export class ProductService {
 
     constructor() {
         this.products = [
-            new Product(1, 'ROSA acrylic paint. Blue 45ml', 45, [ 1, 2], 'hrn'),
+            new Product(1, 'ROSA acrylic paint. Blue 45ml', 45, [1, 2], 'hrn'),
             new Product(2, 'ROSA acrylic paint. Yellow 40ml', 45, [1, 2], 'hrn'),
 
             new Product(3, 'Academy oil paint. Moss Green 100 ml', 70, [1, 4], 'hrn'),
@@ -35,7 +36,7 @@ export class ProductService {
 
     getProductByProductId(productId: number): Product {
         for (let product of this.products) {
-            if (product.id === productId) {
+            if (product._id === productId) {
                 return product;
             }
         }
@@ -43,8 +44,8 @@ export class ProductService {
 
     deleteProductByProductId(productId: number): Product {
         for (let i = 0; i < this.products.length; i += 1) {
-          let deletedProduct: Product = this.products[i];
-            if (this.products[i].id === productId) {
+            let deletedProduct: Product = this.products[i];
+            if (this.products[i]._id === productId) {
                 this.products.splice(i, 1);
                 console.log(`Product with id ${productId} was successful deleted.`);
                 return deletedProduct;
@@ -52,5 +53,33 @@ export class ProductService {
         }
         console.log('there is no product with such id');
     };
+
+
+    changeProductByProductId(productId: number, source: Product) {
+        let changedProduct: Product;
+        const productToChange: Product = this.getProductByProductId(productId);
+
+        if (productToChange) {
+            source._id = productId;
+            changedProduct = Object.assign(productToChange, source)
+        }
+
+        return changedProduct;
+    }
+
+
+    createProduct(source: Product): Product {
+        if (source.name === '' || source.price < 0 || source.currency === '') {
+            return;
+        }
+
+        let createdProduct: Product;
+        let idOfLastProduct: number = this.products[this.products.length - 1]._id;
+        source._id = idOfLastProduct + 1;
+        this.products.push(source);
+        createdProduct = this.getProductByProductId(source._id);
+
+        return createdProduct;
+    }
 
 }

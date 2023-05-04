@@ -107,6 +107,45 @@ app.put('/api/v1/admin/categories/:categoryId', (req, res) => {
 
 
 
+
+// @ts-ignore
+app.put('/api/v1/admin/products/:productId', (req, res) => {
+    const productId: number = Number(req.params.productId);
+    const changedProduct = productService.changeProductByProductId(productId, req.body);
+
+    if (changedProduct) {
+        res.json(changedProduct);
+    } else {
+        res.status(404).json({error: `product with id: ${productId}  NOT FOUND`});
+    }
+})
+
+
+// @ts-ignore
+app.post('/api/v1/admin/products', (req, res) => {
+    const createdProduct = productService.createProduct(req.body);
+
+    if (createdProduct) {
+        res.json(createdProduct);
+    } else {
+        res.status(404).json({error: 'Invalid request'});
+    }
+})
+
+// @ts-ignore
+app.post('/api/v1/admin/categories', (req, res) => {
+    const createdCategory = categoryService.createCategory(req.body);
+
+    if (createdCategory) {
+        res.json(createdCategory);
+    } else {
+        res.status(404).json({error: 'Invalid request'});
+    }
+})
+
+
+
+
 app.listen(port, '0.0.0.0', function () {
     console.log('Listening at http://localhost:3003/\n')
 })
