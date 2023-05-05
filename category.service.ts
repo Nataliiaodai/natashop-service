@@ -6,13 +6,14 @@ export class CategoryService {
     categories: Category []
 
     constructor() {
-        this.categories = [
-            new Category(1, 'Paint'),
-            new Category(2, 'Acrylic Paint'),
-            new Category(3, 'Watercolor Paint'),
-            new Category(4, 'Oil Paint'),
-            new Category(5, 'Brushes'),
-        ];
+        this.categories = require('./data/categories-initial-data.json');
+        // this.categories = [
+        //     new Category(1, 'Paint'),
+        //     new Category(2, 'Acrylic Paint'),
+        //     new Category(3, 'Watercolor Paint'),
+        //     new Category(4, 'Oil Paint'),
+        //     new Category(5, 'Brushes'),
+        // ];
     }
 
 
@@ -22,7 +23,7 @@ export class CategoryService {
         let categoryName: string;
         for (let category of this.categories) {
             if (category._id === categoryId) {
-                categoryName = category.name;
+                categoryName = category.name.uk;
             }
         }
         return categoryName;

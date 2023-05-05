@@ -8,10 +8,10 @@ const productService = new ProductService();
 const categoryService = new CategoryService();
 
 const productsByCategoryId: Product [] = productService.getProductsByCategoryId(3);
-for (let prod of productsByCategoryId) {
-    let detailOfFoundProduct: string = prod.getDetailsLabel();
-    // console.log(detailOfFoundProduct);
-}
+// for (let prod of productsByCategoryId) {
+//     let detailOfFoundProduct: string = prod.getDetailsLabel();
+//     // console.log(detailOfFoundProduct);
+// }
 
 
 console.log('---------------');
@@ -32,7 +32,7 @@ app.use(bodyParser.json());
 
 // @ts-ignore
 app.get('/api/v1/admin/products/:productId', (req, res) => {
-    // console.log("Try find product by id", req.params.productId);
+    // console.log("Try to find product by id", req.params.productId);
     const productId: number = Number(req.params.productId);
     const product: Product = productService.getProductByProductId(productId);
     if (!product) {
@@ -47,7 +47,7 @@ app.get('/api/v1/admin/products/:productId', (req, res) => {
 
 // @ts-ignore
 app.get('/api/v1/admin/categories/:categoryId', (req, res) => {
-    // console.log("Try find category by id", req.params.categoryId);
+    // console.log("Try to find category by id", req.params.categoryId);
     const categoryId: number = Number(req.params.categoryId);
     const category: Category = categoryService.getCategoryByCategoryId(categoryId);
     // console.log("Found category by id", categoryId, category);
@@ -131,6 +131,7 @@ app.post('/api/v1/admin/products', (req, res) => {
         res.status(404).json({error: 'Invalid request'});
     }
 })
+
 
 // @ts-ignore
 app.post('/api/v1/admin/categories', (req, res) => {
