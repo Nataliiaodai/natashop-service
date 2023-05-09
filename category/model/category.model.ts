@@ -1,4 +1,4 @@
-import {MultiLangText} from "./multiLangText.model";
+import {MultiLangText} from "../../shared-model/multiLangText.model";
 import {CategoryMediasModel} from "./category-medias.model";
 
 

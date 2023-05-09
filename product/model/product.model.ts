@@ -1,6 +1,6 @@
-import {MediasObjectModel} from "./medias.object.model";
-import {MultiLangText} from "./multiLangText.model";
-import {CategoriesIdentifyModel} from "./categories-identify.model";
+import {MediasObjectModel} from "../../shared-model/medias.object.model";
+import {MultiLangText} from "../../shared-model/multiLangText.model";
+import {CategoriesIdentifyModel} from "../../category/model/categories-identify.model";
 
 
 export class Product {
@@ -34,7 +34,6 @@ export class Product {
 
 
     getDetailsLabel(): string {
-        // return `Product name: ${this.name} price: ${this.price}, ID: ${this.id}, categories: ${this.categories[0]}, ${this.categories[1]}`;
         return `Product name: ${this.name} price: ${this.price}, ID: ${this._id}, categories: ${this.categories}`;
 
     }

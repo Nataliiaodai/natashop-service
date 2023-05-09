@@ -1,5 +1,5 @@
 
-import {MultiLangText} from "./multiLangText.model";
+import {MultiLangText} from "../../shared-model/multiLangText.model";
 import {CategoryImageURLModel} from "./category-image-URL.model";
 
 export class CategoryMediasModel {

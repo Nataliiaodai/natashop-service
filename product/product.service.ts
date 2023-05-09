@@ -1,26 +1,22 @@
-import {Product} from "./product.model";
+import {Product} from "./model/product.model";
+import {AdminProductPageDto} from "./model/admin-product-page-dto";
 
 
 export class ProductService {
 
     products: Product [];
+    maxId: number = 0;
+
 
     constructor() {
-        this.products = require('./data/products-initial-data.json');
-        // this.products = [
-        //     new Product(1, 'ROSA acrylic paint. Blue 45ml', 45, [1, 2], 'hrn'),
-        //     new Product(2, 'ROSA acrylic paint. Yellow 40ml', 45, [1, 2], 'hrn'),
-        //
-        //     new Product(3, 'Academy oil paint. Moss Green 100 ml', 70, [1, 4], 'hrn'),
-        //     new Product(4, 'Academy oil paint. Dark Blue 100 ml', 70, [1, 4], 'hrn'),
-        //     new Product(5, 'Academy oil paint. Navy 100 ml', 70, [1, 4], 'hrn'),
-        //
-        //     new Product(6, 'Daniel Smith watercolor paint. Hot Red 5 ml', 20, [1, 3], 'hrn'),
-        //     new Product(7, 'Daniel Smith watercolor paint. Orange 5 ml', 20, [1, 3], 'hrn'),
-        //
-        //     new Product(8, 'Santi Studio brush. Flat, synthetic', 35, [1, 5], 'hrn'),
-        //     new Product(9, 'Da Vinci brush. Round, synthetic, soft', 40, [1, 5], 'hrn'),
-        // ];
+        this.products = require('../data/products-initial-data.json');
+
+        for (let i = 0; i < this.products.length; i += 1) {
+            if (this.products[i]._id > this.maxId) {
+                this.maxId = this.products[i]._id;
+            }
+        }
+
     };
 
     getProductsByCategoryId(categoryId: number): Product[] {
@@ -70,17 +66,36 @@ export class ProductService {
 
 
     createProduct(source: Product): Product {
-        if (source.name.uk === '' || source.price < 0 ) {
+        if (source.name.uk === '' || source.price < 0) {
             return;
         }
 
         let createdProduct: Product;
-        let idOfLastProduct: number = this.products[this.products.length - 1]._id;
-        source._id = idOfLastProduct + 1;
+        this.maxId += 1;
+        source._id = this.maxId;
+
         this.products.push(source);
         createdProduct = this.getProductByProductId(source._id);
 
         return createdProduct;
     }
+
+    getProductPage(page: number, limit: number, sort?: string, direction?: string): AdminProductPageDto {
+        let pageToReturn: AdminProductPageDto = new AdminProductPageDto();
+        pageToReturn.itemsFiltered = this.products.length;
+        pageToReturn.itemsTotal = this.products.length;
+        pageToReturn.pagesTotal = Math.round(pageToReturn.itemsFiltered / limit);
+        pageToReturn.page = page;
+
+        const start = limit * page - limit;
+        const end = start + limit;
+        for (let i = start; i < end; i += 1) {
+            pageToReturn.data.push(this.products[i]);
+        }
+
+
+        return pageToReturn;
+    }
+
 
 }
