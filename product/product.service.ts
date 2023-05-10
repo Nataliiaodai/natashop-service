@@ -87,14 +87,34 @@ export class ProductService {
         pageToReturn.pagesTotal = Math.round(pageToReturn.itemsFiltered / limit);
         pageToReturn.page = page;
 
+        console.log('sort', sort);
+        console.log('direction', direction);
+
         const start = limit * page - limit;
         const end = start + limit;
+
         for (let i = start; i < end; i += 1) {
             pageToReturn.data.push(this.products[i]);
+
+        }
+
+        if (sort === '_id' && direction === 'asc') {
+            pageToReturn.data.sort(function (x, y) {
+
+                return x._id - y._id;
+            })
+            console.log('pageToReturn.data ----- ', pageToReturn.data);
+        } else {
+            pageToReturn.data.sort(function (x, y) {
+
+                return y._id - x._id;
+            })
+            console.log('pageToReturn.data ----- ', pageToReturn.data);
         }
 
 
         return pageToReturn;
+
     }
 
 

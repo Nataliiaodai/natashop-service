@@ -19,7 +19,7 @@ console.log('---------------');
 console.log('---------------');
 console.log('---------------');
 
-productService.getProductPage(1, 2);
+productService.getProductPage(3, 3, '_id', 'desc');
 
 console.log('---------------');
 
@@ -99,8 +99,9 @@ app.get('/api/v1/admin/products', (req, res) => {
 
    let pageToReturn: AdminProductPageDto = productService.getProductPage(page, limit, sort, direction);
     console.log( 'pageToReturn ', pageToReturn.data.length);
+    console.log( 'sort ', sort);
+    console.log( 'direction ', direction);
 
-    // console.log('req.query' , req.query);
 
     if (!pageToReturn) {
         res.status(404).json({error: 'No items found'});
