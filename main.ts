@@ -19,7 +19,7 @@ console.log('---------------');
 console.log('---------------');
 console.log('---------------');
 
-productService.getProductPage(3, 3, '_id', 'desc');
+// productService.getProductPage(3, 3, 'name', 'desc');
 
 console.log('---------------');
 

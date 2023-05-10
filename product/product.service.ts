@@ -80,6 +80,23 @@ export class ProductService {
         return createdProduct;
     }
 
+    getSortedProducts(productsToSort: Product [], sort: string, direction: string): Product [] {
+        if (sort === '_id' && direction === 'asc') {
+            return productsToSort.sort((x, y) => x._id - y._id);
+        }
+        if (sort === '_id' && direction === 'desc') {
+            return productsToSort.sort((x, y) => y._id - x._id);
+        }
+        if (sort === 'name' && direction === 'asc') {
+            return productsToSort.sort((x, y) =>
+                x.name.uk.localeCompare(y.name.uk));
+        }
+        if (sort === 'name' && direction === 'desc') {
+            return productsToSort.sort((x, y) =>
+                y.name.uk.localeCompare(x.name.uk));
+        }
+    }
+
     getProductPage(page: number, limit: number, sort?: string, direction?: string): AdminProductPageDto {
         let pageToReturn: AdminProductPageDto = new AdminProductPageDto();
         pageToReturn.itemsFiltered = this.products.length;
@@ -90,31 +107,15 @@ export class ProductService {
         console.log('sort', sort);
         console.log('direction', direction);
 
+        let sortedProducts: Product [] = this.getSortedProducts(this.products, sort, direction);
+
         const start = limit * page - limit;
         const end = start + limit;
-
         for (let i = start; i < end; i += 1) {
-            pageToReturn.data.push(this.products[i]);
-
+            pageToReturn.data.push(sortedProducts[i]);
         }
-
-        if (sort === '_id' && direction === 'asc') {
-            pageToReturn.data.sort(function (x, y) {
-
-                return x._id - y._id;
-            })
-            console.log('pageToReturn.data ----- ', pageToReturn.data);
-        } else {
-            pageToReturn.data.sort(function (x, y) {
-
-                return y._id - x._id;
-            })
-            console.log('pageToReturn.data ----- ', pageToReturn.data);
-        }
-
 
         return pageToReturn;
-
     }
 
 
