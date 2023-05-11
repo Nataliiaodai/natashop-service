@@ -94,10 +94,11 @@ app.post('/api/v1/admin/products', (req, res) => {
 app.get('/api/v1/admin/products', (req, res) => {
     const page: number = Number(req.query.page);
     const limit: number = Number(req.query.limit);
+    const searchString: string = req.query.searchString;
     const sort: string = req.query.sort;
     const direction: string = req.query.direction;
 
-   let pageToReturn: AdminProductPageDto = productService.getProductPage(page, limit, sort, direction);
+   let pageToReturn: AdminProductPageDto = productService.getProductPage(page, limit, searchString, sort, direction);
     console.log( 'pageToReturn ', pageToReturn.data.length);
     console.log( 'sort ', sort);
     console.log( 'direction ', direction);
@@ -169,7 +170,6 @@ app.post('/api/v1/admin/categories', (req, res) => {
         res.status(404).json({error: 'Invalid request'});
     }
 })
-
 
 
 

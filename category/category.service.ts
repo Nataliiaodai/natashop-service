@@ -1,5 +1,6 @@
 import {Category} from "./model/category.model";
 import {Product} from "../product/model/product.model";
+import {AdminProductPageDto} from "../product/model/admin-product-page-dto";
 
 export class CategoryService {
 
@@ -71,6 +72,7 @@ export class CategoryService {
 
         return createdCategory;
     }
+
 
 
 }

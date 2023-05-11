@@ -95,17 +95,24 @@ export class ProductService {
             return productsToSort.sort((x, y) =>
                 y.name.uk.localeCompare(x.name.uk));
         }
+        if (sort === 'price' && direction === 'asc') {
+            return productsToSort.sort((x, y) => x.price - y.price);
+        }
+        if (sort === 'price' && direction === 'desc') {
+            return productsToSort.sort((x, y) => y.price - x.price);
+        }
+
     }
 
-    getProductPage(page: number, limit: number, sort?: string, direction?: string): AdminProductPageDto {
+    getProductPage(page: number, limit: number, searchString?: string, sort?: string, direction?: string): AdminProductPageDto {
         let pageToReturn: AdminProductPageDto = new AdminProductPageDto();
         pageToReturn.itemsFiltered = this.products.length;
         pageToReturn.itemsTotal = this.products.length;
         pageToReturn.pagesTotal = Math.round(pageToReturn.itemsFiltered / limit);
         pageToReturn.page = page;
 
-        console.log('sort', sort);
-        console.log('direction', direction);
+        // console.log('sort', sort);
+        // console.log('direction', direction);
 
         let sortedProducts: Product [] = this.getSortedProducts(this.products, sort, direction);
 
