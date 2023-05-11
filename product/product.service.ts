@@ -80,28 +80,17 @@ export class ProductService {
         return createdProduct;
     }
 
-    getSortedProducts(productsToSort: Product [], sort: string, direction: string): Product [] {
-        if (sort === '_id' && direction === 'asc') {
-            return productsToSort.sort((x, y) => x._id - y._id);
+    getSortedProducts(productsToSort: Product[], sort: string, direction: string): Product[] {
+        let compareFunction: (a: Product, b: Product) => number;
+        if (sort === '_id' || sort === 'price') {
+            compareFunction = (x, y) => direction === 'asc'
+                ? x[sort] - y[sort] : y[sort] - x[sort];
         }
-        if (sort === '_id' && direction === 'desc') {
-            return productsToSort.sort((x, y) => y._id - x._id);
+        if (sort === 'name') {
+            compareFunction = (x, y) => direction === 'asc'
+                ? x.name.uk.localeCompare(y.name.uk) : y.name.uk.localeCompare(x.name.uk);
         }
-        if (sort === 'name' && direction === 'asc') {
-            return productsToSort.sort((x, y) =>
-                x.name.uk.localeCompare(y.name.uk));
-        }
-        if (sort === 'name' && direction === 'desc') {
-            return productsToSort.sort((x, y) =>
-                y.name.uk.localeCompare(x.name.uk));
-        }
-        if (sort === 'price' && direction === 'asc') {
-            return productsToSort.sort((x, y) => x.price - y.price);
-        }
-        if (sort === 'price' && direction === 'desc') {
-            return productsToSort.sort((x, y) => y.price - x.price);
-        }
-
+        return productsToSort.sort(compareFunction);
     }
 
     getProductPage(page: number, limit: number, searchString?: string, sort?: string, direction?: string): AdminProductPageDto {
@@ -111,8 +100,6 @@ export class ProductService {
         pageToReturn.pagesTotal = Math.round(pageToReturn.itemsFiltered / limit);
         pageToReturn.page = page;
 
-        // console.log('sort', sort);
-        // console.log('direction', direction);
 
         let sortedProducts: Product [] = this.getSortedProducts(this.products, sort, direction);
 
