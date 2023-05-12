@@ -8,18 +8,18 @@ export class ClientProductDto {
     categories: CategoriesIdentifyModel [] = [];
     attributes: AttributesModel [] = [];
     medias: MediasObjectModel[] = [];
-    name: MultiLangText;
+    name: string;
     slug: string;
-    fullDescription: MultiLangText;
+    fullDescription: string;
     price: number;
 
     constructor(
         categories: CategoriesIdentifyModel [] = [],
         attributes: AttributesModel [] = [],
         medias: MediasObjectModel[] = [],
-        name: MultiLangText = new MultiLangText(),
+        name: string = '',
         slug: string = '',
-        fullDescription: MultiLangText = new MultiLangText(),
+        fullDescription: string = '',
         price: number = 0,
         )
     {

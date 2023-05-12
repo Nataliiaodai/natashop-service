@@ -114,23 +114,24 @@ export class ProductService {
     }
 
 
-
-    getProductBySlug(slug : string):ClientProductDto {
-        let productBySlug : ClientProductDto = new ClientProductDto();
+    getProductBySlug(slug: string): ClientProductDto {
 
         for (let product of this.products) {
-           if (product.slug === slug)  {
-               productBySlug.slug = slug;
-               productBySlug.name = product.name;
-               productBySlug.medias = product.medias;
-               productBySlug.price = product.price;
-               productBySlug.categories = product.categories;
-               // productBySlug.attributes =
-               productBySlug.fullDescription = product.fullDescription;
-           }
+            if (product.slug === slug) {
+                const productBySlug: ClientProductDto = new ClientProductDto();
+
+                productBySlug.slug = slug;
+                productBySlug.name = product.name.uk;
+                productBySlug.medias = product.medias;
+                productBySlug.price = product.price;
+                productBySlug.categories = product.categories;
+                // productBySlug.attributes =
+                productBySlug.fullDescription = product.fullDescription.uk;
+                return productBySlug
+            }
         }
 
-        return productBySlug;
+        return undefined;
     }
 
 

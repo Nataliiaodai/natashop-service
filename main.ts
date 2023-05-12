@@ -190,11 +190,7 @@ app.post('/api/v1/admin/categories', (req, res) => {
 app.get('/api/v1/products/slug/:slug', (req, res) => {
     const productSlug: string = req.params.slug;
 
-    console.log('productSlug', productSlug);
-
     const productBySlug: ClientProductDto = productService.getProductBySlug(productSlug);
-
-    console.log('productBySlug', productBySlug);
 
     if (productBySlug) {
         res.json(productBySlug);
