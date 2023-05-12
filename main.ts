@@ -3,40 +3,31 @@ import {ProductService} from "./product/product.service";
 import {CategoryService} from "./category/category.service";
 import {Category} from "./category/model/category.model";
 import {AdminProductPageDto} from "./product/model/admin-product-page-dto";
-
-
-const productService = new ProductService();
-const categoryService = new CategoryService();
-
-const productsByCategoryId: Product [] = productService.getProductsByCategoryId(3);
-// for (let prod of productsByCategoryId) {
-//     let detailOfFoundProduct: string = prod.getDetailsLabel();
-//     // console.log(detailOfFoundProduct);
-// }
-
-
-console.log('---------------');
-console.log('---------------');
-console.log('---------------');
-
-// productService.getProductPage(3, 3, 'name', 'desc');
-
-console.log('---------------');
+import {ClientProductDto} from "./product/model/client-product-dto";
 
 const express = require('express')
 const app = express()
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const port = 3003;
-
+const multer = require("multer");
+// const upload = multer({ dest: "uploads/" });
+// const upload = multer({ dest: "/Users/nataliiaodai/projects/natashop-service/uploads/products" });
 
 app.use(cors());
 // app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 
+const productService = new ProductService();
+const categoryService = new CategoryService();
 
-/** Admin API/Products */
+
+console.log('---------------');
+console.log('---------------');
+
+
+/** admin API/Products */
 
 // @ts-ignore
 app.get('/api/v1/admin/products/:productId', (req, res) => {
@@ -113,8 +104,29 @@ app.get('/api/v1/admin/products', (req, res) => {
 
 
 
+// app.post('/api/v1/admin/products/media',upload.single("file"), uploadFile);
+// // @ts-ignore
+// function uploadFile(req, res) {
+//     console.log(req.body);
+//     console.log(req.files);
+//     res.json({ message: "Successfully uploaded files" });
+// }
 
-/** Admin API/Categories */
+// @ts-ignore
+// app.post('/api/v1/admin/products/media',upload.array("files"), (req, res) => {
+//     // console.log(req.body);
+//     console.log(req);
+//     console.log(req.files);
+//     res.json({ message: "Successfully uploaded files" });
+// });
+
+
+
+
+
+
+
+/** admin API/Categories */
 
 
 // @ts-ignore
@@ -172,6 +184,24 @@ app.post('/api/v1/admin/categories', (req, res) => {
 })
 
 
+
+/** client API/Categories */
+// @ts-ignore
+app.get('/api/v1/products/slug/:slug', (req, res) => {
+    const productSlug: string = req.params.slug;
+
+    console.log('productSlug', productSlug);
+
+    const productBySlug: ClientProductDto = productService.getProductBySlug(productSlug);
+
+    console.log('productBySlug', productBySlug);
+
+    if (productBySlug) {
+        res.json(productBySlug);
+    } else {
+        res.status(404).json({error: 'Invalid request'});
+    }
+})
 
 
 

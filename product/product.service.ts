@@ -1,5 +1,6 @@
 import {Product} from "./model/product.model";
 import {AdminProductPageDto} from "./model/admin-product-page-dto";
+import {ClientProductDto} from "./model/client-product-dto";
 
 
 export class ProductService {
@@ -110,6 +111,26 @@ export class ProductService {
         }
 
         return pageToReturn;
+    }
+
+
+
+    getProductBySlug(slug : string):ClientProductDto {
+        let productBySlug : ClientProductDto = new ClientProductDto();
+
+        for (let product of this.products) {
+           if (product.slug === slug)  {
+               productBySlug.slug = slug;
+               productBySlug.name = product.name;
+               productBySlug.medias = product.medias;
+               productBySlug.price = product.price;
+               productBySlug.categories = product.categories;
+               // productBySlug.attributes =
+               productBySlug.fullDescription = product.fullDescription;
+           }
+        }
+
+        return productBySlug;
     }
 
 
