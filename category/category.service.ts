@@ -1,6 +1,5 @@
 import {Category} from "./model/category.model";
-import {Product} from "../product/model/product.model";
-import {AdminProductPageDto} from "../product/model/admin-product-page-dto";
+import {ClientCategoryDto} from "./model/client-category-dto";
 
 export class CategoryService {
 
@@ -74,5 +73,19 @@ export class CategoryService {
     }
 
 
+    getCategoryBySlug(slug: string): ClientCategoryDto {
+        for (let category of this.categories) {
+            if (category.slug === slug) {
+                const categoryBySlug: ClientCategoryDto = new ClientCategoryDto();
+                categoryBySlug.slug = slug;
+                categoryBySlug.id = category._id;
+                categoryBySlug.name = category.name.uk;
+                categoryBySlug.description = category.description.uk;
+                return categoryBySlug;
+            }
+        }
+
+        return undefined;
+    }
 
 }

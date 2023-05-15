@@ -1,6 +1,11 @@
 import {Product} from "./model/product.model";
-import {AdminProductPageDto} from "./model/admin-product-page-dto";
-import {ClientProductDto} from "./model/client-product-dto";
+import {ClientProductDto} from "./model/client-product.dto";
+import {AdminProductPageDto} from "./model/admin-product-page.dto";
+import {ClientProductPageDto} from "./model/client-product-page.dto";
+import {ClientProductFilterValueDto} from "./model/client-product-filter-value.dto";
+import {ClientProductListItemDto} from "./model/client-product-list-item.dto";
+import {ClientMediaDto} from "./model/client-media.dto";
+import {MediasObjectModel} from "../shared-model/medias.object.model";
 
 
 export class ProductService {
@@ -81,7 +86,7 @@ export class ProductService {
         return createdProduct;
     }
 
-    getSortedProducts(productsToSort: Product[], sort: string, direction: string): Product[] {
+    getSortedAdminProducts(productsToSort: Product[], sort: string, direction: string): Product[] {
         let compareFunction: (a: Product, b: Product) => number;
         if (sort === '_id' || sort === 'price') {
             compareFunction = (x, y) => direction === 'asc'
@@ -94,23 +99,23 @@ export class ProductService {
         return productsToSort.sort(compareFunction);
     }
 
-    getProductPage(page: number, limit: number, searchString?: string, sort?: string, direction?: string): AdminProductPageDto {
-        let pageToReturn: AdminProductPageDto = new AdminProductPageDto();
-        pageToReturn.itemsFiltered = this.products.length;
-        pageToReturn.itemsTotal = this.products.length;
-        pageToReturn.pagesTotal = Math.round(pageToReturn.itemsFiltered / limit);
-        pageToReturn.page = page;
+    getAdminProductPage(page: number, limit: number, searchString?: string, sort?: string, direction?: string): AdminProductPageDto {
+        let pageToReturnOnAdmin: AdminProductPageDto = new AdminProductPageDto();
+        pageToReturnOnAdmin.itemsFiltered = this.products.length;
+        pageToReturnOnAdmin.itemsTotal = this.products.length;
+        pageToReturnOnAdmin.pagesTotal = Math.round(pageToReturnOnAdmin.itemsFiltered / limit);
+        pageToReturnOnAdmin.page = page;
 
 
-        let sortedProducts: Product [] = this.getSortedProducts(this.products, sort, direction);
+        let sortedProducts: Product [] = this.getSortedAdminProducts(this.products, sort, direction);
 
         const start = limit * page - limit;
         const end = start + limit;
         for (let i = start; i < end; i += 1) {
-            pageToReturn.data.push(sortedProducts[i]);
+            pageToReturnOnAdmin.data.push(sortedProducts[i]);
         }
 
-        return pageToReturn;
+        return pageToReturnOnAdmin;
     }
 
 
@@ -127,11 +132,155 @@ export class ProductService {
                 productBySlug.categories = product.categories;
                 // productBySlug.attributes =
                 productBySlug.fullDescription = product.fullDescription.uk;
-                return productBySlug
+                return productBySlug;
             }
         }
 
         return undefined;
+    }
+
+
+
+
+    getClientProductPage(page: number, limit: number, searchString?: string, sort?: string, direction?: string): ClientProductPageDto {
+        let pageToReturnOnClient: ClientProductPageDto = new ClientProductPageDto();
+        pageToReturnOnClient.itemsFiltered = this.products.length;
+        pageToReturnOnClient.itemsTotal = this.products.length;
+        pageToReturnOnClient.pagesTotal = Math.round(pageToReturnOnClient.itemsFiltered / limit);
+        pageToReturnOnClient.page = page;
+
+        let tempSortedProducts: Product[] = this.getSortedAdminProducts(this.products, sort, direction);
+        let sortedClientProd: ClientProductListItemDto =  new ClientProductListItemDto();
+
+
+
+        for (let prod of tempSortedProducts) {
+            sortedClientProd.categories = prod.categories;
+            sortedClientProd.attributes = [];
+            /* Option 1
+            sortedClientProd.medias = prod.medias.map(
+                function (mediaModel: MediasObjectModel) {
+                    const clientMediaDto: ClientMediaDto = new ClientMediaDto();
+                    clientMediaDto.altText = mediaModel.altText.uk;
+                    clientMediaDto.variantsUrls = mediaModel.variantsUrls;
+                    return clientMediaDto;
+                }
+            );
+            */
+
+            /* Option 2
+            const mapToClientMediaFunction: (m: MediasObjectModel) => ClientMediaDto =
+                function (mediaModel: MediasObjectModel) {
+                    const clientMediaDto: ClientMediaDto = new ClientMediaDto();
+                    clientMediaDto.altText = mediaModel.altText.uk;
+                    clientMediaDto.variantsUrls = mediaModel.variantsUrls;
+                    return clientMediaDto;
+                };
+            sortedClientProd.medias = prod.medias.map(mapToClientMediaFunction);
+            */
+
+            /*   Option 3
+            const mapToClientMediaFunction: (m: MediasObjectModel) => ClientMediaDto =
+                mediaModel => {
+                    const clientMediaDto: ClientMediaDto = new ClientMediaDto();
+                    clientMediaDto.altText = mediaModel.altText.uk;
+                    clientMediaDto.variantsUrls = mediaModel.variantsUrls;
+                    return clientMediaDto;
+                };
+            sortedClientProd.medias = prod.medias.map(mapToClientMediaFunction);
+            */
+
+            /* Option 4
+            const mapToClientMediaFunction: (m: MediasObjectModel) => ClientMediaDto =
+                mediaModel => {
+                    const clientMediaDto: ClientMediaDto = {
+                        altText : mediaModel.altText.uk,
+                        variantsUrls : mediaModel.variantsUrls
+                    };
+                    return clientMediaDto;
+                };
+            sortedClientProd.medias = prod.medias.map(mapToClientMediaFunction);
+            */
+
+            /* Option 5
+            const mapToClientMediaFunction: (m: MediasObjectModel) => ClientMediaDto =
+                mediaModel => {
+                    return {
+                        altText : mediaModel.altText.uk,
+                        variantsUrls : mediaModel.variantsUrls
+                    };
+                };
+            sortedClientProd.medias = prod.medias.map(mapToClientMediaFunction);
+            */
+
+            /* Option 6
+            const mapToClientMediaFunction: (m: MediasObjectModel) => ClientMediaDto =
+                mediaModel => ({
+                    altText: mediaModel.altText.uk,
+                    variantsUrls: mediaModel.variantsUrls
+                });
+            sortedClientProd.medias = prod.medias.map(mapToClientMediaFunction);
+            */
+
+            /* Option 7
+            sortedClientProd.medias = prod.medias.map(mediaModel => ({
+                altText: mediaModel.altText.uk,
+                variantsUrls: mediaModel.variantsUrls
+            }));
+            */
+
+            /* Option 8
+            sortedClientProd.medias = prod.medias.map(mediaModel => {
+                return {
+                    altText : mediaModel.altText.uk,
+                    variantsUrls : mediaModel.variantsUrls
+                };
+            });
+            */
+
+            sortedClientProd.medias = [];
+            for (let mediaModel of prod.medias) {
+                sortedClientProd.medias.push(
+                    {
+                        altText : mediaModel.altText.uk,
+                        variantsUrls : mediaModel.variantsUrls
+                    }
+                )
+            }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            // arr.map(function(element){
+            //     return element *3;
+            // });
+            //
+            sortedClientProd.name = prod.name.uk;
+            sortedClientProd.slug = prod.slug;
+            sortedClientProd.fullDescription = prod.fullDescription.uk;
+            sortedClientProd.price = prod.price;
+        }
+
+        const start = limit * page - limit;
+        const end = start + limit;
+        for (let i = start; i < end; i += 1) {
+            pageToReturnOnClient.data.push(sortedClientProd);
+        }
+
+        return pageToReturnOnClient;
     }
 
 

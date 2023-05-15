@@ -1,4 +1,4 @@
-export class CategoryImageURLModel {
+export class ImageUrlModel {
   original: string;
   large: string;
   medium: string;

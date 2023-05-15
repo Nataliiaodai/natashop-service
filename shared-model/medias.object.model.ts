@@ -1,15 +1,14 @@
 import {MultiLangText} from "./multiLangText.model";
+import {ImageUrlModel} from "./image-url.model";
 
-
-class ImageURLSModel {
-}
 
 export class MediasObjectModel {
     altText: MultiLangText;
-    variantsUrls: ImageURLSModel;
+    variantsUrls: ImageUrlModel;
 
-    constructor(altText: MultiLangText = new MultiLangText(), variantsUrls: ImageURLSModel = new ImageURLSModel()) {
+    constructor(altText: MultiLangText = new MultiLangText(), variantsUrls: ImageUrlModel = new ImageUrlModel()) {
         this.altText = altText;
         this.variantsUrls = variantsUrls;
     }
+
 }

@@ -10,7 +10,7 @@ export class Product {
     _id: number;
     fullDescription: MultiLangText;
     slug: string;
-    medias: MediasObjectModel [] = [];
+    medias: MediasObjectModel[] = [];
     categories: CategoriesIdentifyModel [] = [];
 
     constructor(name: MultiLangText = new MultiLangText(),

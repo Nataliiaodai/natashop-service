@@ -2,7 +2,7 @@ import {MultiLangText} from "../../shared-model/multiLangText.model";
 import {MediasObjectModel} from "../../shared-model/medias.object.model";
 
 
-export class ProductListItem {
+export class AdminProductListItemDto {
     _id: number;
     name: MultiLangText;
     price: number;
