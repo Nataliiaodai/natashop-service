@@ -1,3 +1,4 @@
+import 'reflect-metadata';
 import {Product} from "./product/model/product.model";
 import {ProductService} from "./product/product.service";
 import {CategoryService} from "./category/category.service";

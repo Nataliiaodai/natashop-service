@@ -6,16 +6,24 @@ import {ClientProductFilterValueDto} from "./model/client-product-filter-value.d
 import {ClientProductListItemDto} from "./model/client-product-list-item.dto";
 import {ClientMediaDto} from "./model/client-media.dto";
 import {MediasObjectModel} from "../shared-model/medias.object.model";
+import {plainToClass} from "class-transformer";
 
 
 export class ProductService {
 
-    products: Product [];
+    products: Product[];
     maxId: number = 0;
 
 
     constructor() {
-        this.products = require('../data/products-initial-data.json');
+        const rawProducts: Product[] = require('../data/products-initial-data.json');
+        this.products = [];
+        for (let rawProduct of rawProducts) {
+            const product : Product = plainToClass(Product, rawProduct, { excludeExtraneousValues: true });
+            this.products.push(product);
+        }
+        // this.products = plainToClass(Product, this.products, {excludeExtraneousValues: true})
+        // this.products = removeExtraFields(this.products, Product);
 
         for (let i = 0; i < this.products.length; i += 1) {
             if (this.products[i]._id > this.maxId) {
@@ -127,7 +135,13 @@ export class ProductService {
 
                 productBySlug.slug = slug;
                 productBySlug.name = product.name.uk;
-                productBySlug.medias = product.medias;
+                productBySlug.medias = product.medias.map(mediaModel => {
+                    return {
+                        altText: mediaModel.altText.uk,
+                        variantsUrls: mediaModel.variantsUrls
+                    };
+                });
+
                 productBySlug.price = product.price;
                 productBySlug.categories = product.categories;
                 // productBySlug.attributes =
@@ -140,8 +154,6 @@ export class ProductService {
     }
 
 
-
-
     getClientProductPage(page: number, limit: number, searchString?: string, sort?: string, direction?: string): ClientProductPageDto {
         let pageToReturnOnClient: ClientProductPageDto = new ClientProductPageDto();
         pageToReturnOnClient.itemsFiltered = this.products.length;
@@ -150,124 +162,29 @@ export class ProductService {
         pageToReturnOnClient.page = page;
 
         let tempSortedProducts: Product[] = this.getSortedAdminProducts(this.products, sort, direction);
-        let sortedClientProd: ClientProductListItemDto =  new ClientProductListItemDto();
-
+        let sortedClientProd: ClientProductListItemDto = new ClientProductListItemDto();
 
 
         for (let prod of tempSortedProducts) {
             sortedClientProd.categories = prod.categories;
             sortedClientProd.attributes = [];
-            /* Option 1
-            sortedClientProd.medias = prod.medias.map(
-                function (mediaModel: MediasObjectModel) {
-                    const clientMediaDto: ClientMediaDto = new ClientMediaDto();
-                    clientMediaDto.altText = mediaModel.altText.uk;
-                    clientMediaDto.variantsUrls = mediaModel.variantsUrls;
-                    return clientMediaDto;
-                }
-            );
-            */
 
-            /* Option 2
-            const mapToClientMediaFunction: (m: MediasObjectModel) => ClientMediaDto =
-                function (mediaModel: MediasObjectModel) {
-                    const clientMediaDto: ClientMediaDto = new ClientMediaDto();
-                    clientMediaDto.altText = mediaModel.altText.uk;
-                    clientMediaDto.variantsUrls = mediaModel.variantsUrls;
-                    return clientMediaDto;
-                };
-            sortedClientProd.medias = prod.medias.map(mapToClientMediaFunction);
-            */
-
-            /*   Option 3
-            const mapToClientMediaFunction: (m: MediasObjectModel) => ClientMediaDto =
-                mediaModel => {
-                    const clientMediaDto: ClientMediaDto = new ClientMediaDto();
-                    clientMediaDto.altText = mediaModel.altText.uk;
-                    clientMediaDto.variantsUrls = mediaModel.variantsUrls;
-                    return clientMediaDto;
-                };
-            sortedClientProd.medias = prod.medias.map(mapToClientMediaFunction);
-            */
-
-            /* Option 4
-            const mapToClientMediaFunction: (m: MediasObjectModel) => ClientMediaDto =
-                mediaModel => {
-                    const clientMediaDto: ClientMediaDto = {
-                        altText : mediaModel.altText.uk,
-                        variantsUrls : mediaModel.variantsUrls
-                    };
-                    return clientMediaDto;
-                };
-            sortedClientProd.medias = prod.medias.map(mapToClientMediaFunction);
-            */
-
-            /* Option 5
-            const mapToClientMediaFunction: (m: MediasObjectModel) => ClientMediaDto =
-                mediaModel => {
-                    return {
-                        altText : mediaModel.altText.uk,
-                        variantsUrls : mediaModel.variantsUrls
-                    };
-                };
-            sortedClientProd.medias = prod.medias.map(mapToClientMediaFunction);
-            */
-
-            /* Option 6
-            const mapToClientMediaFunction: (m: MediasObjectModel) => ClientMediaDto =
-                mediaModel => ({
-                    altText: mediaModel.altText.uk,
-                    variantsUrls: mediaModel.variantsUrls
-                });
-            sortedClientProd.medias = prod.medias.map(mapToClientMediaFunction);
-            */
-
-            /* Option 7
-            sortedClientProd.medias = prod.medias.map(mediaModel => ({
-                altText: mediaModel.altText.uk,
-                variantsUrls: mediaModel.variantsUrls
-            }));
-            */
-
-            /* Option 8
             sortedClientProd.medias = prod.medias.map(mediaModel => {
                 return {
-                    altText : mediaModel.altText.uk,
-                    variantsUrls : mediaModel.variantsUrls
+                    altText: mediaModel.altText.uk,
+                    variantsUrls: mediaModel.variantsUrls
                 };
             });
-            */
+            // sortedClientProd.medias = [];
+            // for (let mediaModel of prod.medias) {
+            //     sortedClientProd.medias.push(
+            //         {
+            //             altText : mediaModel.altText.uk,
+            //             variantsUrls : mediaModel.variantsUrls
+            //         }
+            //     )
+            // }
 
-            sortedClientProd.medias = [];
-            for (let mediaModel of prod.medias) {
-                sortedClientProd.medias.push(
-                    {
-                        altText : mediaModel.altText.uk,
-                        variantsUrls : mediaModel.variantsUrls
-                    }
-                )
-            }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-            // arr.map(function(element){
-            //     return element *3;
-            // });
-            //
             sortedClientProd.name = prod.name.uk;
             sortedClientProd.slug = prod.slug;
             sortedClientProd.fullDescription = prod.fullDescription.uk;
