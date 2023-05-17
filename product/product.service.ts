@@ -2,28 +2,30 @@ import {Product} from "./model/product.model";
 import {ClientProductDto} from "./model/client-product.dto";
 import {AdminProductPageDto} from "./model/admin-product-page.dto";
 import {ClientProductPageDto} from "./model/client-product-page.dto";
-import {ClientProductFilterValueDto} from "./model/client-product-filter-value.dto";
 import {ClientProductListItemDto} from "./model/client-product-list-item.dto";
-import {ClientMediaDto} from "./model/client-media.dto";
-import {MediasObjectModel} from "../shared-model/medias.object.model";
 import {plainToClass} from "class-transformer";
+import {CategoryService} from "../category/category.service";
+import {Category} from "../category/model/category.model";
+import {CategoriesIdentifyModel} from "../category/model/categories-identify.model";
+import {ClientProductCategoryDto} from "./model/client-product-category.dto";
 
 
 export class ProductService {
 
-    products: Product[];
-    maxId: number = 0;
+    private readonly products: Product[];
+    private maxId: number = 0;
 
+    private readonly categoryService: CategoryService;
 
-    constructor() {
+    constructor(categoryService: CategoryService) {
+        this.categoryService = categoryService;
         const rawProducts: Product[] = require('../data/products-initial-data.json');
         this.products = [];
         for (let rawProduct of rawProducts) {
-            const product : Product = plainToClass(Product, rawProduct, { excludeExtraneousValues: true });
+            const product: Product = plainToClass(Product, rawProduct, {excludeExtraneousValues: true});
             this.products.push(product);
         }
-        // this.products = plainToClass(Product, this.products, {excludeExtraneousValues: true})
-        // this.products = removeExtraFields(this.products, Product);
+
 
         for (let i = 0; i < this.products.length; i += 1) {
             if (this.products[i]._id > this.maxId) {
@@ -126,6 +128,23 @@ export class ProductService {
         return pageToReturnOnAdmin;
     }
 
+    toClientProductCategories(prodCategories: CategoriesIdentifyModel[]): ClientProductCategoryDto[] {
+        const clientCategories: ClientProductCategoryDto[] = [];
+        for (let category of prodCategories) {
+            let categoryByCategoryId: Category;
+            categoryByCategoryId = this.categoryService.getCategoryByCategoryId(category.id);
+
+            if (categoryByCategoryId) {
+                clientCategories.push({
+                    id: category.id,
+                    name: categoryByCategoryId.name.uk,
+                    slug: categoryByCategoryId.slug
+                })
+            }
+        }
+        return clientCategories;
+    }
+
 
     getProductBySlug(slug: string): ClientProductDto {
 
@@ -143,9 +162,9 @@ export class ProductService {
                 });
 
                 productBySlug.price = product.price;
-                productBySlug.categories = product.categories;
                 // productBySlug.attributes =
                 productBySlug.fullDescription = product.fullDescription.uk;
+                productBySlug.categories = this.toClientProductCategories(product.categories);
                 return productBySlug;
             }
         }
@@ -155,29 +174,35 @@ export class ProductService {
 
 
     getClientProductPage(page: number, limit: number, searchString?: string, sort?: string, direction?: string): ClientProductPageDto {
-        let pageToReturnOnClient: ClientProductPageDto = new ClientProductPageDto();
-        pageToReturnOnClient.itemsFiltered = this.products.length;
-        pageToReturnOnClient.itemsTotal = this.products.length;
-        pageToReturnOnClient.pagesTotal = Math.round(pageToReturnOnClient.itemsFiltered / limit);
-        pageToReturnOnClient.page = page;
-
         let tempSortedProducts: Product[] = this.getSortedAdminProducts(this.products, sort, direction);
-        let sortedClientProd: ClientProductListItemDto = new ClientProductListItemDto();
+
+        const sortedLimitedProducts: Product[] = [];
+        const start = limit * page - limit;
+        const end = start + limit;
+        for (let i = start; i < end; i += 1) {
+            sortedLimitedProducts.push(tempSortedProducts[i]);
+        }
 
 
-        for (let prod of tempSortedProducts) {
-            sortedClientProd.categories = prod.categories;
-            sortedClientProd.attributes = [];
 
-            sortedClientProd.medias = prod.medias.map(mediaModel => {
+        let clientProducts : ClientProductListItemDto[] = [];
+
+        for (let product of sortedLimitedProducts) {
+
+            let clientProduct: ClientProductListItemDto = new ClientProductListItemDto();
+
+            clientProduct.categories = this.toClientProductCategories(product.categories);
+            clientProduct.attributes = [];
+
+            clientProduct.medias = product.medias.map(mediaModel => {
                 return {
                     altText: mediaModel.altText.uk,
                     variantsUrls: mediaModel.variantsUrls
                 };
             });
-            // sortedClientProd.medias = [];
+            // clientProduct.medias = [];
             // for (let mediaModel of prod.medias) {
-            //     sortedClientProd.medias.push(
+            //     clientProduct.medias.push(
             //         {
             //             altText : mediaModel.altText.uk,
             //             variantsUrls : mediaModel.variantsUrls
@@ -185,17 +210,22 @@ export class ProductService {
             //     )
             // }
 
-            sortedClientProd.name = prod.name.uk;
-            sortedClientProd.slug = prod.slug;
-            sortedClientProd.fullDescription = prod.fullDescription.uk;
-            sortedClientProd.price = prod.price;
+            clientProduct.name = product.name.uk;
+            clientProduct.slug = product.slug;
+            clientProduct.fullDescription = product.fullDescription.uk;
+            clientProduct.price = product.price;
+
+            clientProducts.push(clientProduct)
         }
 
-        const start = limit * page - limit;
-        const end = start + limit;
-        for (let i = start; i < end; i += 1) {
-            pageToReturnOnClient.data.push(sortedClientProd);
-        }
+
+        let pageToReturnOnClient: ClientProductPageDto = new ClientProductPageDto();
+        pageToReturnOnClient.itemsFiltered = this.products.length;
+        pageToReturnOnClient.itemsTotal = this.products.length;
+        pageToReturnOnClient.pagesTotal = Math.round(pageToReturnOnClient.itemsFiltered / limit);
+        pageToReturnOnClient.page = page;
+
+        pageToReturnOnClient.data = clientProducts;
 
         return pageToReturnOnClient;
     }

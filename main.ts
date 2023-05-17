@@ -1,3 +1,4 @@
+import Express, {Send} from 'express';
 import 'reflect-metadata';
 import {Product} from "./product/model/product.model";
 import {ProductService} from "./product/product.service";
@@ -8,12 +9,14 @@ import {ClientCategoryDto} from "./category/model/client-category-dto";
 import {ClientProductPageDto} from "./product/model/client-product-page.dto";
 import {AdminProductPageDto} from "./product/model/admin-product-page.dto";
 
-const express = require('express')
-const app = express()
+// const express = require('express')
+const app = Express();
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const port = 3003;
-const multer = require("multer");
+// const multer = require("multer");
+
+
 // const upload = multer({ dest: "uploads/" });
 // const upload = multer({ dest: "/Users/nataliiaodai/projects/natashop-service/uploads/products" });
 
@@ -22,8 +25,9 @@ app.use(cors());
 app.use(bodyParser.json());
 
 
-const productService = new ProductService();
 const categoryService = new CategoryService();
+
+const productService = new ProductService(categoryService);
 
 
 console.log('---------------');
@@ -32,7 +36,7 @@ console.log('---------------');
 
 /** admin API/Products */
 
-// @ts-ignore
+
 app.get('/api/v1/admin/products/:productId', (req, res) => {
     const productId: number = Number(req.params.productId);
     const product: Product = productService.getProductByProductId(productId);
@@ -45,7 +49,7 @@ app.get('/api/v1/admin/products/:productId', (req, res) => {
 })
 
 
-// @ts-ignore
+
 app.delete('/api/v1/admin/products/:productId', (req, res) => {
     const productId: number = Number(req.params.productId);
     let deletedProduct: Product = productService.deleteProductByProductId(productId);
@@ -59,7 +63,6 @@ app.delete('/api/v1/admin/products/:productId', (req, res) => {
 })
 
 
-// @ts-ignore
 app.put('/api/v1/admin/products/:productId', (req, res) => {
     const productId: number = Number(req.params.productId);
     const changedProduct = productService.changeProductByProductId(productId, req.body);
@@ -72,7 +75,6 @@ app.put('/api/v1/admin/products/:productId', (req, res) => {
 })
 
 
-// @ts-ignore
 app.post('/api/v1/admin/products', (req, res) => {
     const createdProduct = productService.createProduct(req.body);
 
@@ -84,7 +86,6 @@ app.post('/api/v1/admin/products', (req, res) => {
 })
 
 
-// @ts-ignore
 app.get('/api/v1/admin/products', (req, res) => {
     const page: number = Number(req.query.page);
     const limit: number = Number(req.query.limit);
@@ -128,7 +129,6 @@ app.get('/api/v1/admin/products', (req, res) => {
 /** admin API/Categories */
 
 
-// @ts-ignore
 app.get('/api/v1/admin/categories/:categoryId', (req, res) => {
     const categoryId: number = Number(req.params.categoryId);
     const category: Category = categoryService.getCategoryByCategoryId(categoryId);
@@ -144,7 +144,6 @@ app.get('/api/v1/admin/categories/:categoryId', (req, res) => {
 
 
 
-// @ts-ignore
 app.delete('/api/v1/admin/categories/:categoryId', (req, res) => {
     const categoryId: number = Number(req.params.categoryId);
     let deletedCategory: Category = categoryService.deleteCategoryByCategoryId(categoryId);
@@ -157,7 +156,6 @@ app.delete('/api/v1/admin/categories/:categoryId', (req, res) => {
 })
 
 
-// @ts-ignore
 app.put('/api/v1/admin/categories/:categoryId', (req, res) => {
     const categoryId: number = Number(req.params.categoryId);
     const changedCategory = categoryService.changeCategoryByCategoryId(categoryId, req.body);
@@ -171,7 +169,7 @@ app.put('/api/v1/admin/categories/:categoryId', (req, res) => {
 
 
 
-// @ts-ignore
+
 app.post('/api/v1/admin/categories', (req, res) => {
     const createdCategory = categoryService.createCategory(req.body);
 
@@ -186,7 +184,6 @@ app.post('/api/v1/admin/categories', (req, res) => {
 
 /** client API/Products */
 
-// @ts-ignore
 app.get('/api/v1/products/slug/:slug', (req, res) => {
     const productSlug: string = req.params.slug;
 
@@ -200,7 +197,7 @@ app.get('/api/v1/products/slug/:slug', (req, res) => {
 })
 
 
-// @ts-ignore
+
 app.get('/api/v1/products', (req, res) => {
 
     const page: number = Number(req.query.page);
@@ -229,7 +226,7 @@ app.get('/api/v1/products', (req, res) => {
 
 /** client API/Categories */
 
-// @ts-ignore
+
 app.get('/api/v1/categories/:slug', (req, res) => {
     const slug: string = req.params.slug;
 

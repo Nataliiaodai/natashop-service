@@ -1,13 +1,15 @@
-{"compilerOptions": {
-  "module": "commonjs",
-  "declaration": true,
-  "removeComments": true,
-  "emitDecoratorMetadata": true,
-  "experimentalDecorators": true,
-  "target": "ES2019",
-  "sourceMap": true,
-  "outDir": "./build",
-  "baseUrl": "./",
-  "incremental": true
-}
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "declaration": true,
+    "removeComments": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "target": "ES2019",
+    "sourceMap": true,
+    "outDir": "./build",
+    "baseUrl": "./",
+    "incremental": true,
+    "esModuleInterop": true,
+  }
 }
