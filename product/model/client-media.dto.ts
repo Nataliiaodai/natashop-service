@@ -1,4 +1,3 @@
-import {MultiLangText} from "../../shared-model/multiLangText.model";
 import {ImageUrlModel} from "../../shared-model/image-url.model";
 
 export class ClientMediaDto {

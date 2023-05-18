@@ -1,5 +1,6 @@
-import {ClientProductListItemDto} from "./client-product-list-item.dto";
+
 import {ClientProductFilterDto} from "./client-product-filter.dto";
+import {ClientProductDto} from "./client-product.dto";
 
 
 export class ClientProductPageDto {
@@ -8,7 +9,7 @@ export class ClientProductPageDto {
     itemsTotal: number;
     page: number;
     pagesTotal: number;
-    data: ClientProductListItemDto[];
+    data: ClientProductDto[];
 
     constructor(
         filters: ClientProductFilterDto [] = [],
@@ -16,7 +17,7 @@ export class ClientProductPageDto {
         itemsTotal = 0,
         page = 0,
         pagesTotal = 0,
-        data: ClientProductListItemDto [] = []) {
+        data: ClientProductDto [] = []) {
 
         this.filters = filters;
         this.itemsFiltered = itemsFiltered;

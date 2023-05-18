@@ -2,12 +2,13 @@ import {Product} from "./model/product.model";
 import {ClientProductDto} from "./model/client-product.dto";
 import {AdminProductPageDto} from "./model/admin-product-page.dto";
 import {ClientProductPageDto} from "./model/client-product-page.dto";
-import {ClientProductListItemDto} from "./model/client-product-list-item.dto";
+
 import {plainToClass} from "class-transformer";
 import {CategoryService} from "../category/category.service";
 import {Category} from "../category/model/category.model";
 import {CategoriesIdentifyModel} from "../category/model/categories-identify.model";
 import {ClientProductCategoryDto} from "./model/client-product-category.dto";
+import {AdminProductDto} from "./model/admin-product.dto";
 
 
 export class ProductService {
@@ -96,7 +97,7 @@ export class ProductService {
         return createdProduct;
     }
 
-    getSortedAdminProducts(productsToSort: Product[], sort: string, direction: string): Product[] {
+    getSortedProducts(productsToSort: Product[], sort: string, direction: string): Product[] {
         let compareFunction: (a: Product, b: Product) => number;
         if (sort === '_id' || sort === 'price') {
             compareFunction = (x, y) => direction === 'asc'
@@ -109,23 +110,46 @@ export class ProductService {
         return productsToSort.sort(compareFunction);
     }
 
+
+    filterProduct(products: Product[], searchString: string): Product[] {
+        let filteredProductsByName: Product[] = [];
+        if (searchString) {
+            for (let i = 0; i < this.products.length; i += 1) {
+                let nameToLowerCase: string = this.products[i].name.uk.toLowerCase();
+                if (nameToLowerCase.includes(searchString.toLowerCase())) {
+                    filteredProductsByName.push(this.products[i]);
+                }
+            }
+
+        } else {
+            filteredProductsByName = this.products;
+        }
+
+        return filteredProductsByName;
+    }
+
     getAdminProductPage(page: number, limit: number, searchString?: string, sort?: string, direction?: string): AdminProductPageDto {
-        let pageToReturnOnAdmin: AdminProductPageDto = new AdminProductPageDto();
-        pageToReturnOnAdmin.itemsFiltered = this.products.length;
-        pageToReturnOnAdmin.itemsTotal = this.products.length;
-        pageToReturnOnAdmin.pagesTotal = Math.round(pageToReturnOnAdmin.itemsFiltered / limit);
-        pageToReturnOnAdmin.page = page;
+        const filteredProductsByName: Product[] = this.filterProduct(this.products, searchString);
+        const sortedProducts: Product[] = this.getSortedProducts(filteredProductsByName, sort, direction);
+        const adminProductData: AdminProductDto[] = this.getProductPage(limit, page, sortedProducts);
 
+        return {
+            itemsFiltered : filteredProductsByName.length,
+            itemsTotal: this.products.length,
+            pagesTotal: Math.round(filteredProductsByName.length / limit),
+            page: page,
+            data: adminProductData
+        }
+    }
 
-        let sortedProducts: Product [] = this.getSortedAdminProducts(this.products, sort, direction);
-
+    private getProductPage(limit: number, page: number, sortedProducts: Product[]): AdminProductDto[] {
+        const adminProductData: AdminProductDto[] = [];
         const start = limit * page - limit;
         const end = start + limit;
         for (let i = start; i < end; i += 1) {
-            pageToReturnOnAdmin.data.push(sortedProducts[i]);
+            adminProductData.push(sortedProducts[i]);
         }
-
-        return pageToReturnOnAdmin;
+        return adminProductData;
     }
 
     toClientProductCategories(prodCategories: CategoriesIdentifyModel[]): ClientProductCategoryDto[] {
@@ -174,61 +198,39 @@ export class ProductService {
 
 
     getClientProductPage(page: number, limit: number, searchString?: string, sort?: string, direction?: string): ClientProductPageDto {
-        let tempSortedProducts: Product[] = this.getSortedAdminProducts(this.products, sort, direction);
+        let getAdminProdPageResult: AdminProductPageDto = this.getAdminProductPage(page, limit, searchString, sort, direction);
 
-        const sortedLimitedProducts: Product[] = [];
-        const start = limit * page - limit;
-        const end = start + limit;
-        for (let i = start; i < end; i += 1) {
-            sortedLimitedProducts.push(tempSortedProducts[i]);
+        let clientProductDataItems: ClientProductDto[] = [];
+        let adminProductDataItems: AdminProductDto[] = getAdminProdPageResult.data;
+
+        for (let item of adminProductDataItems) {
+            let dataItem: ClientProductDto = {
+                categories: this.toClientProductCategories(item.categories),
+                attributes: [],
+                medias: item.medias.map(mediaModel => {
+                    return {
+                        altText: mediaModel.altText.uk,
+                        variantsUrls: mediaModel.variantsUrls
+                    };
+                }),
+                name: item.name.uk,
+                slug: item.slug,
+                fullDescription: item.fullDescription.uk,
+                price: item.price,
+            }
+
+            clientProductDataItems.push(dataItem);
         }
 
+        return {
+            filters: [],
+            itemsFiltered: getAdminProdPageResult.itemsFiltered,
+            itemsTotal: getAdminProdPageResult.itemsTotal,
+            page: getAdminProdPageResult.page,
+            pagesTotal: getAdminProdPageResult.pagesTotal,
+            data: clientProductDataItems
+        };
 
-
-        let clientProducts : ClientProductListItemDto[] = [];
-
-        for (let product of sortedLimitedProducts) {
-
-            let clientProduct: ClientProductListItemDto = new ClientProductListItemDto();
-
-            clientProduct.categories = this.toClientProductCategories(product.categories);
-            clientProduct.attributes = [];
-
-            clientProduct.medias = product.medias.map(mediaModel => {
-                return {
-                    altText: mediaModel.altText.uk,
-                    variantsUrls: mediaModel.variantsUrls
-                };
-            });
-            // clientProduct.medias = [];
-            // for (let mediaModel of prod.medias) {
-            //     clientProduct.medias.push(
-            //         {
-            //             altText : mediaModel.altText.uk,
-            //             variantsUrls : mediaModel.variantsUrls
-            //         }
-            //     )
-            // }
-
-            clientProduct.name = product.name.uk;
-            clientProduct.slug = product.slug;
-            clientProduct.fullDescription = product.fullDescription.uk;
-            clientProduct.price = product.price;
-
-            clientProducts.push(clientProduct)
-        }
-
-
-        let pageToReturnOnClient: ClientProductPageDto = new ClientProductPageDto();
-        pageToReturnOnClient.itemsFiltered = this.products.length;
-        pageToReturnOnClient.itemsTotal = this.products.length;
-        pageToReturnOnClient.pagesTotal = Math.round(pageToReturnOnClient.itemsFiltered / limit);
-        pageToReturnOnClient.page = page;
-
-        pageToReturnOnClient.data = clientProducts;
-
-        return pageToReturnOnClient;
     }
-
 
 }
