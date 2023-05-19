@@ -1,5 +1,7 @@
 import {Category} from "./model/category.model";
 import {ClientCategoryDto} from "./model/client-category-dto";
+import {CategoryTreeDto} from "./model/category.tree.dto";
+import {CategoryTreeItemDto} from "./model/categoryTreeItem.dto";
 
 export class CategoryService {
 
@@ -87,5 +89,51 @@ export class CategoryService {
 
         return undefined;
     }
+
+
+    getAdminCategoryTree(): CategoryTreeDto {
+        const tempItems: CategoryTreeItemDto[] = [];
+        for (let category of this.categories) {
+            let item: CategoryTreeItemDto = {
+                _id: category._id,
+                parentId: category.parentId,
+                name: category.name,
+                slug: category.slug,
+                medias: category.medias,
+                children: []
+            }
+
+            tempItems.push(item);
+        }
+
+        let categoryTreeDataItems: CategoryTreeItemDto[] = [];
+        for (let item of tempItems) {
+            if (item.parentId === 0) {
+                categoryTreeDataItems.push(item);
+            } else {
+                for (let parent of tempItems) {
+                    if (parent._id === item.parentId) {
+                        parent.children.push(item);
+                        break;
+                    }
+                }
+            }
+        }
+
+        return {
+            data: categoryTreeDataItems
+        }
+    }
+
+
+    // getClientCategoryTree() {
+    //    let adminCategoryTree: CategoryTreeDto = this.getAdminCategoryTree();
+    //
+    //
+    //
+    //
+    //
+    // }
+
 
 }

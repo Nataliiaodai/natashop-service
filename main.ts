@@ -8,6 +8,7 @@ import {ClientProductDto} from "./product/model/client-product.dto";
 import {ClientCategoryDto} from "./category/model/client-category-dto";
 import {ClientProductPageDto} from "./product/model/client-product-page.dto";
 import {AdminProductPageDto} from "./product/model/admin-product-page.dto";
+import {CategoryTreeDto} from "./category/model/category.tree.dto";
 
 // const express = require('express')
 const app = Express();
@@ -92,8 +93,9 @@ app.get('/api/v1/admin/products', (req, res) => {
     const searchString: string = req.query.searchString;
     const sort: string = req.query.sort;
     const direction: string = req.query.direction;
+    const categoryId: number = Number(req.query.categoryId);
 
-    let pageToReturnOnAdmin: AdminProductPageDto = productService.getAdminProductPage(page, limit, searchString, sort, direction);
+    let pageToReturnOnAdmin: AdminProductPageDto = productService.getAdminProductPage(page, limit, searchString, sort, direction, categoryId);
 
     if (!pageToReturnOnAdmin) {
         res.status(404).json({error: 'No items found'});
@@ -123,10 +125,17 @@ app.get('/api/v1/admin/products', (req, res) => {
 
 
 
-
-
-
 /** admin API/Categories */
+
+app.get('/api/v1/admin/categories/tree', (req, res) => {
+    const tree: CategoryTreeDto = categoryService.getAdminCategoryTree();
+
+    if (tree) {
+        res.json(tree);
+    } else {
+        res.status(404).json({error: 'Invalid request'});
+    }
+})
 
 
 app.get('/api/v1/admin/categories/:categoryId', (req, res) => {
@@ -182,6 +191,8 @@ app.post('/api/v1/admin/categories', (req, res) => {
 
 
 
+
+
 /** client API/Products */
 
 app.get('/api/v1/products/slug/:slug', (req, res) => {
@@ -205,11 +216,9 @@ app.get('/api/v1/products', (req, res) => {
     const searchString: string = req.query.searchString;
     const sort: string = req.query.sort;
     const direction: string = req.query.direction;
+    const categoryId: number = Number(req.query.categoryId);
 
-    let pageToReturnOnClient: ClientProductPageDto = productService.getClientProductPage(page, limit, searchString, sort, direction);
-    console.log( 'pageToReturn ', pageToReturnOnClient.data.length);
-    console.log( 'sort ', sort);
-    console.log( 'direction ', direction);
+    let pageToReturnOnClient: ClientProductPageDto = productService.getClientProductPage(page, limit, searchString, sort, direction, categoryId);
 
     if (!pageToReturnOnClient) {
         res.status(404).json({error: 'No items found'});
@@ -241,6 +250,17 @@ app.get('/api/v1/categories/:slug', (req, res) => {
 })
 
 
+// app.get('/api/v1/categories/tree', (req, res) => {
+//     const tree: CategoryTreeDto = categoryService.getClientCategoryTree();
+//
+//     console.log('tree', tree);
+//
+//     if (tree) {
+//         res.json(tree);
+//     } else {
+//         res.status(404).json({error: 'Invalid request'});
+//     }
+// })
 
 
 

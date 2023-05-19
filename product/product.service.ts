@@ -107,36 +107,57 @@ export class ProductService {
             compareFunction = (x, y) => direction === 'asc'
                 ? x.name.uk.localeCompare(y.name.uk) : y.name.uk.localeCompare(x.name.uk);
         }
+        if (!compareFunction) {
+            return productsToSort;
+        }
         return productsToSort.sort(compareFunction);
     }
 
 
-    filterProduct(products: Product[], searchString: string): Product[] {
+    filterProductByName(products: Product[], searchString: string): Product[] {
         let filteredProductsByName: Product[] = [];
         if (searchString) {
-            for (let i = 0; i < this.products.length; i += 1) {
-                let nameToLowerCase: string = this.products[i].name.uk.toLowerCase();
+            for (let i = 0; i < products.length; i += 1) {
+                let nameToLowerCase: string = products[i].name.uk.toLowerCase();
                 if (nameToLowerCase.includes(searchString.toLowerCase())) {
-                    filteredProductsByName.push(this.products[i]);
+                    filteredProductsByName.push(products[i]);
                 }
             }
 
         } else {
-            filteredProductsByName = this.products;
+            filteredProductsByName = products;
         }
 
         return filteredProductsByName;
     }
 
-    getAdminProductPage(page: number, limit: number, searchString?: string, sort?: string, direction?: string): AdminProductPageDto {
-        const filteredProductsByName: Product[] = this.filterProduct(this.products, searchString);
-        const sortedProducts: Product[] = this.getSortedProducts(filteredProductsByName, sort, direction);
+    filterProductByCategoryId(products: Product[], categoryId:number):Product[] {
+        let filteredProductByCategoryId: Product[] = [];
+        if (categoryId) {
+            for ( let product of products) {
+                for ( let categories of product.categories) {
+                    if (categories.id === categoryId) {
+                        filteredProductByCategoryId.push(product);
+                    }
+                }
+            }
+        }  else {
+            filteredProductByCategoryId = products;
+        }
+        return filteredProductByCategoryId;
+    }
+
+
+    getAdminProductPage(page: number, limit: number, searchString?: string, sort?: string, direction?: string, categoryId?: number): AdminProductPageDto {
+        const filteredProductsByName: Product[] = this.filterProductByName(this.products, searchString);
+        const filteredProductByCategoryId: Product[] = this.filterProductByCategoryId(filteredProductsByName, categoryId);
+        const sortedProducts: Product[] = this.getSortedProducts(filteredProductByCategoryId, sort, direction);
         const adminProductData: AdminProductDto[] = this.getProductPage(limit, page, sortedProducts);
 
         return {
-            itemsFiltered : filteredProductsByName.length,
+            itemsFiltered: filteredProductByCategoryId.length,
             itemsTotal: this.products.length,
-            pagesTotal: Math.round(filteredProductsByName.length / limit),
+            pagesTotal: Math.round(filteredProductByCategoryId.length / limit),
             page: page,
             data: adminProductData
         }
@@ -197,8 +218,8 @@ export class ProductService {
     }
 
 
-    getClientProductPage(page: number, limit: number, searchString?: string, sort?: string, direction?: string): ClientProductPageDto {
-        let getAdminProdPageResult: AdminProductPageDto = this.getAdminProductPage(page, limit, searchString, sort, direction);
+    getClientProductPage(page: number, limit: number, searchString?: string, sort?: string, direction?: string, categoryId?: number): ClientProductPageDto {
+        let getAdminProdPageResult: AdminProductPageDto = this.getAdminProductPage(page, limit, searchString, sort, direction, categoryId);
 
         let clientProductDataItems: ClientProductDto[] = [];
         let adminProductDataItems: AdminProductDto[] = getAdminProdPageResult.data;
@@ -217,7 +238,7 @@ export class ProductService {
                 slug: item.slug,
                 fullDescription: item.fullDescription.uk,
                 price: item.price,
-            }
+            };
 
             clientProductDataItems.push(dataItem);
         }
