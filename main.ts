@@ -9,6 +9,9 @@ import {ClientCategoryDto} from "./category/model/client-category-dto";
 import {ClientProductPageDto} from "./product/model/client-product-page.dto";
 import {AdminProductPageDto} from "./product/model/admin-product-page.dto";
 import {CategoryTreeDto} from "./category/model/category.tree.dto";
+import * as Path from "path";
+import {ClientMediaDto} from "./product/model/client-media.dto";
+import {MediaService} from "./media.service";
 
 const express = require('express');
 const app = express();
@@ -17,57 +20,59 @@ const cors = require('cors');
 const port = 3003;
 const multer = require("multer");
 
-const storageEngine = multer.diskStorage({
-    destination: "uploads/products",
-    filename: (req, file, cb) => {
-        cb(null, `${Date.now()}--${file.originalname}`);
-    },
-});
-
-const upload = multer({
-    storage: storageEngine,
-    limits: { fileSize: 1000000 },
-    fileFilter: (req, file, cb) => {
-        checkFileType(file, cb);
-    },
-});
-
-const path = require("path");
-
-const checkFileType = function (file, cb) {
-    const fileTypes = /jpeg|jpg|png|gif|svg/;
-    const extName = fileTypes.test(path.extname(file.originalname).toLowerCase());
-    const mimeType = fileTypes.test(file.mimetype);
-
-    if (mimeType && extName) {
-        return cb(null, true);
-    } else {
-        cb("Error: You can Only Upload Images!!");
-    }
-};
-
-app.post("/api/v1/admin/products/media" , upload.single("image"), (req, res) => {
-    if (req.file) {
-        res.send("Single file uploaded successfully");
-    } else {
-        res.status(400).send("Please upload a valid image");
-    }
-});
-
-
 app.use('/uploads',express.static('uploads'));
 
 app.use(cors());
 app.use(bodyParser.json());
 
-
 const categoryService = new CategoryService();
-
 const productService = new ProductService(categoryService);
+const mediaService = new MediaService();
 
+/*    https://www.makeuseof.com/upload-image-in-nodejs-using-multer/    */
+const upload = multer({
+    storage: multer.diskStorage({
+        destination: "./uploads",
+        filename: (req, file, cb) => {
+            file.folder = req.url.replace('/api/v1/admin/', '').replace('/media', '');
+            const origFilePath = `${file.folder}/${Date.now()}_${file.originalname}`;
+            file.media = new ClientMediaDto();
+            file.media.variantsUrls.original = `http://127.0.0.1:3003/uploads/${origFilePath}`;
+            cb(null, origFilePath);
+        },
+    }),
+    limits: {fileSize: 10_000_000},
+    fileFilter: (req, file, cb) => {
+        const fileExtention = Path.extname(file.originalname).toLowerCase();
+        if (/jpeg|jpg/.test(fileExtention)) {
+            return cb(null, true);
+        } else {
+            cb("Error: You can Only Upload Images!!");
+        }
+    },
+});
 
-console.log('---------------');
-console.log('---------------');
+app.post('/api/v1/admin/products/media', upload.single("image"), (req, res) => {
+    if (req.file) {
+        mediaService.createMedia(req.file).then(media => {
+            res.json(media);
+            console.log("Media upload success", media);
+        })
+    } else {
+        res.status(400).send("Please upload a valid image");
+    }
+});
+
+app.post('/api/v1/admin/categories/media', upload.single("image"), (req, res) => {
+    if (req.file) {
+        mediaService.createMedia(req.file).then(media => {
+            res.json(media);
+            console.log("Media upload success", media);
+        })
+    } else {
+        res.status(400).send("Please upload a valid image");
+    }
+});
 
 
 /** admin API/Products */
