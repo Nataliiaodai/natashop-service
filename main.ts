@@ -55,10 +55,7 @@ app.post("/api/v1/admin/products/media" , upload.single("image"), (req, res) => 
 });
 
 
-
-
-// const upload = multer({ dest: "uploads/" });
-// const upload = multer({ dest: "/Users/nataliiaodai/projects/natashop-service/uploads/products" });
+app.use('/uploads',express.static('uploads'));
 
 app.use(cors());
 // app.use(bodyParser.urlencoded({ extended: false }));
