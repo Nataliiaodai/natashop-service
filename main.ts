@@ -1,4 +1,4 @@
-import Express, {Send} from 'express';
+import Express from 'express';
 import 'reflect-metadata';
 import {Product} from "./product/model/product.model";
 import {ProductService} from "./product/product.service";
@@ -10,12 +10,51 @@ import {ClientProductPageDto} from "./product/model/client-product-page.dto";
 import {AdminProductPageDto} from "./product/model/admin-product-page.dto";
 import {CategoryTreeDto} from "./category/model/category.tree.dto";
 
-// const express = require('express')
-const app = Express();
+const express = require('express');
+const app = express();
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const port = 3003;
-// const multer = require("multer");
+const multer = require("multer");
+
+const storageEngine = multer.diskStorage({
+    destination: "uploads/products",
+    filename: (req, file, cb) => {
+        cb(null, `${Date.now()}--${file.originalname}`);
+    },
+});
+
+const upload = multer({
+    storage: storageEngine,
+    limits: { fileSize: 1000000 },
+    fileFilter: (req, file, cb) => {
+        checkFileType(file, cb);
+    },
+});
+
+const path = require("path");
+
+const checkFileType = function (file, cb) {
+    const fileTypes = /jpeg|jpg|png|gif|svg/;
+    const extName = fileTypes.test(path.extname(file.originalname).toLowerCase());
+    const mimeType = fileTypes.test(file.mimetype);
+
+    if (mimeType && extName) {
+        return cb(null, true);
+    } else {
+        cb("Error: You can Only Upload Images!!");
+    }
+};
+
+app.post("/api/v1/admin/products/media" , upload.single("image"), (req, res) => {
+    if (req.file) {
+        res.send("Single file uploaded successfully");
+    } else {
+        res.status(400).send("Please upload a valid image");
+    }
+});
+
+
 
 
 // const upload = multer({ dest: "uploads/" });
@@ -248,19 +287,6 @@ app.get('/api/v1/categories/:slug', (req, res) => {
     }
 
 })
-
-
-// app.get('/api/v1/categories/tree', (req, res) => {
-//     const tree: CategoryTreeDto = categoryService.getClientCategoryTree();
-//
-//     console.log('tree', tree);
-//
-//     if (tree) {
-//         res.json(tree);
-//     } else {
-//         res.status(404).json({error: 'Invalid request'});
-//     }
-// })
 
 
 
