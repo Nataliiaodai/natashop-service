@@ -58,7 +58,6 @@ app.post("/api/v1/admin/products/media" , upload.single("image"), (req, res) => 
 app.use('/uploads',express.static('uploads'));
 
 app.use(cors());
-// app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 
